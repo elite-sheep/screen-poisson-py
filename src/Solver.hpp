@@ -170,6 +170,8 @@ public:
     void                    setupBackend    (void);
     void                    solveIndirect   (void);
     void                    evaluateMetrics (void);
+
+	const Vec3f*                    getFinalImage(void);
     // void                    exportImages    (void);
 
     // void					setImages		(const float * const h_ib, const float * const h_dx, const float * const h_dy, const int width, const int height);
@@ -192,7 +194,7 @@ private:
                             Solver          (const Solver&); // forbidden
     Solver&                 operator=       (const Solver&); // forbidden
 
-private:
+public:
       SolverParams m_params;
 //    DebugWindow             m_debugWindow;
 

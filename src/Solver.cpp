@@ -685,6 +685,35 @@ void Solver::evaluateMetrics(void)
 
 //------------------------------------------------------------------------
 
+const Vec3f* Solver::getFinalImage(void)
+{
+// Final.
+{
+	if (m_direct[0]) {
+		int n = m_size.x * m_size.y;
+		int fn = m_params.nframes*n;
+
+		std::vector<Vec3f> data;
+		data.resize(n*m_params.nframes);
+		for (int i=0; i < m_params.nframes; i++)
+			memcpy(&data[i*n], m_direct[i], sizeof(Vec3f)*n); //linearize image sequence into 1D array
+
+		m_backend->write(m_r, data.data());
+		m_backend->calc_axpy(m_r, 1.0f, m_r, m_x);
+	}
+	else
+	{
+		m_backend->copy(m_r, m_x);
+	}
+
+	const Vec3f* p_r = (const Vec3f*)m_backend->map(m_r);
+    return p_r;
+	//	for (int i=0; i < m_params.nframes; i++)
+	// exportImage2(p_r, m_params.finalPFM, m_params.finalPNG, m_z); //!
+	// m_backend->unmap(m_r, (void*)p_r, false);
+}
+}
+
 // void Solver::exportImages(void)
 // {
 // 	// Final.

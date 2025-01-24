@@ -10,7 +10,7 @@ find_package(Python 3.10 COMPONENTS Interpreter Development REQUIRED)
 
 find_package(CUDAToolkit 11.5 REQUIRED)
 
-set(CMAKE_CUDA_ARCHITECTURES 35)
+set(CMAKE_CUDA_ARCHITECTURES 75-virtual)
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -rdc=true")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ext/nanobind)
 set(NANOBIND_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/ext/nanobind)

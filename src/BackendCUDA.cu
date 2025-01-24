@@ -596,7 +596,7 @@ __global__ void kernel_Ax_xAx(Vec3f* Ax, Vec3f* xAx, const float* w2, const Vec3
     for (int c = 0; c < 3; c++)
     {
         float t = sum[c];
-        for (int i = 1; i < 32; i *= 2) t += __shfl_xor(t, i);
+        for (int i = 1; i < 32; i *= 2) t += __shfl_xor_sync(0xffffffff, t, i);
         if (threadIdx.x == 0) atomicAdd(&xAx->x + c, t);
     }
 }
@@ -675,7 +675,7 @@ __global__ void kernel_xdoty(Vec3f* xdoty, const Vec3f* x, const Vec3f* y, int n
     for (int c = 0; c < 3; c++)
     {
         float t = sum[c];
-        for (int i = 1; i < 32; i *= 2) t += __shfl_xor(t, i);
+        for (int i = 1; i < 32; i *= 2) t += __shfl_xor_sync(0xffffffff, t, i);
         if (threadIdx.x == 0) atomicAdd(&xdoty->x + c, t);
     }
 }
@@ -722,7 +722,7 @@ __global__ void kernel_r_rz(Vec3f* r, Vec3f* rz, const Vec3f* Ap, const Vec3f* r
     for (int c = 0; c < 3; c++)
     {
         float t = sum[c];
-        for (int i = 1; i < 32; i *= 2) t += __shfl_xor(t, i);
+        for (int i = 1; i < 32; i *= 2) t += __shfl_xor_sync(0xffffffff, t, i);
         if (threadIdx.x == 0) atomicAdd(&rz->x + c, t);
     }
 }
@@ -799,7 +799,7 @@ __global__ void kernel_w2sum(float* w2sum, const Vec3f* e, float reg, int numEle
     for (int i = begin; i < end; i += 32)
         sum += 1.0f / (length(ld4(e[i])) + reg);
 
-    for (int i = 1; i < 32; i *= 2) sum += __shfl_xor(sum, i);
+    for (int i = 1; i < 32; i *= 2) sum += __shfl_xor_sync(0xffffffff, sum, i);
     if (threadIdx.x == 0) atomicAdd(w2sum, sum);
 }
 

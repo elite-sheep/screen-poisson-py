@@ -28,17 +28,19 @@ NB_MODULE(screenpoissonpy, m) {
                 throw std::runtime_error("Images must have the same dimensions");
             }
 
-            self.m_size = poisson::Vec2i(primal.shape(0), primal.shape(1));
+            int width = primal.shape(1);
+            int height = primal.shape(0);
+            self.m_size = poisson::Vec2i(width, height);
             Vec3f* primalPtr = new Vec3f[primal.shape(0) * primal.shape(1)];
             Vec3f* dxPtr = new Vec3f[primal.shape(0) * primal.shape(1)];
             Vec3f* dyPtr = new Vec3f[primal.shape(0) * primal.shape(1)];
-            for (int i = 0; i < self.m_size.x; ++i)
+            for (int i = 0; i < height; ++i)
             {
-                for (int j = 0; j < self.m_size.y; ++j)
+                for (int j = 0; j < width; ++j)
                 {
-                    primalPtr[i * self.m_size.y + j] = Vec3f(primal(i, j, 0), primal(i, j, 1), primal(i, j, 2));
-                    dxPtr[i * self.m_size.y + j] = Vec3f(dx(i, j, 0), dx(i, j, 1), dx(i, j, 2));
-                    dyPtr[i * self.m_size.y + j] = Vec3f(dy(i, j, 0), dy(i, j, 1), dy(i, j, 2));
+                    primalPtr[i * width + j] = Vec3f(primal(i, j, 0), primal(i, j, 1), primal(i, j, 2));
+                    dxPtr[i * width + j] = Vec3f(dx(i, j, 0), dx(i, j, 1), dx(i, j, 2));
+                    dyPtr[i * width + j] = Vec3f(dy(i, j, 0), dy(i, j, 1), dy(i, j, 2));
                 }
             }
 
@@ -50,18 +52,14 @@ NB_MODULE(screenpoissonpy, m) {
         .def("getFinalImage", [](poisson::Solver& self) {
             auto img = self.getFinalImage();
             float* result = new float[self.m_size.x * self.m_size.y * 3];
-            int index = 0;
-            for (int i = 0; i < self.m_size.x; ++i)
+            for (int i = 0; i < self.m_size.x * self.m_size.y; ++i)
             {
-                for (int j = 0; j < self.m_size.y; ++j)
-                {
-                    result[index++] = img[i * self.m_size.y + j].x;
-                    result[index++] = img[i * self.m_size.y + j].y;
-                    result[index++] = img[i * self.m_size.y + j].z;
-                }
+                result[3*i] = img[i].x;
+                result[3*i+1] = img[i].y;
+                result[3*i+2] = img[i].z;
             }
             self.m_backend->unmap(self.m_r, (void*)img, false);
 
-            return nb::ndarray<nb::numpy, float, nb::ndim<3>>(result, {(size_t)self.m_size.x, (size_t)self.m_size.y, 3}).cast();
+            return nb::ndarray<nb::numpy, float, nb::ndim<3>>(result, {(size_t)self.m_size.y, (size_t)self.m_size.x, 3}).cast();
         });
 }
